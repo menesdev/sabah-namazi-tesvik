@@ -747,15 +747,39 @@
 
   /* RESPONSIVE */
   @media (max-width: 680px) {
-    .header-inner, .main { padding-left: 20px; padding-right: 20px; }
-    .ayet-banner { padding-left: 20px; padding-right: 20px; }
-    .stats-bar { padding-left: 20px; padding-right: 20px; }
+    .header-inner, .main, .ayet-banner, .stats-bar { padding-left: 16px; padding-right: 16px; }
+    .header-date { font-size: 26px; line-height: 1.3; }
+    .header-top { flex-direction: column; align-items: flex-start; }
+    .date-controls { align-items: flex-start; width: 100%; }
     .two-col, .three-col { grid-template-columns: 1fr; }
-    .namaz-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
-    .namaz-name { font-size: 10px; }
-    .header-top { flex-direction: column; }
+    
+    /* Stats Bar (2x2 grid) */
+    .stats-bar { flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
+    .stat-item { flex: 0 0 50%; padding: 8px; border-right: none; }
+    .stat-item:nth-child(1), .stat-item:nth-child(2) { border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.1); }
+    .stat-num { font-size: 18px; }
+    
+    /* Namaz Grid */
+    .namaz-grid { gap: 4px; }
+    .namaz-item { padding: 10px 4px 8px; }
+    .namaz-name { font-size: 9px; }
+    .namaz-time-input { width: 100%; min-width: auto; font-size: 10px; }
+    
+    /* Time Block */
+    .time-block { grid-template-columns: 75px 1fr auto auto; gap: 6px; }
+    .tb-time-input { width: 100%; font-size: 11px; }
+    .tb-content { min-width: 0; font-size: 13px; }
+    .tb-pill { font-size: 9px; padding: 2px 6px; }
+    
+    /* Always show delete buttons on mobile (no hover on touch) */
+    .btn-del { opacity: 1; margin-left: 0; }
+    .checklist li .btn-del, .goal-item .btn-del, .reading-item .btn-del, .time-block .btn-del { opacity: 1; }
+    
+    /* Goal Input Wraps */
+    .goal-input-wrap { flex-wrap: wrap; }
+    #progTime, #readMax { width: 100% !important; flex: 1 1 100% !important; text-align: left !important; }
   }
-
   .btn-del {
     background: none;
     border: none;
