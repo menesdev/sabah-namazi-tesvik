@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Günlük Planlayıcı</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F3EB;
+    --cream-dark: #EDE6D6;
+    --green-deep: #1B4332;
+    --green-mid: #2D6A4F;
+    --green-light: #52B788;
+    --green-pale: #D8F3DC;
+    --gold: #B7860B;
+    --gold-light: #F0C040;
+    --gold-pale: #FDF3DC;
+    --text-main: #1A1A16;
+    --text-muted: #5C5742;
+    --text-light: #9A8F72;
+    --border: rgba(27, 67, 50, 0.15);
+    --border-strong: rgba(27, 67, 50, 0.3);
+    --shadow-sm: 0 2px 8px rgba(27, 67, 50, 0.08);
+    --shadow-md: 0 4px 20px rgba(27, 67, 50, 0.12);
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--text-main);
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .page-bg {
+    background: var(--cream);
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(45,106,79,0.06) 0%, transparent 60%),
+      radial-gradient(circle at 100% 100%, rgba(183,134,11,0.05) 0%, transparent 60%);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--green-deep);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-geo {
+    position: absolute;
+    top: 0; right: 0;
+    width: 300px; height: 100%;
+    opacity: 0.06;
+  }
+
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 36px 48px 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .basmala {
+    font-family: 'Amiri', serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .header-title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .header-date {
+    font-family: 'Amiri', serif;
+    font-size: 36px;
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .header-hijri {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .date-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .date-controls input[type="date"] {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-family: 'Lato', sans-serif;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .date-controls input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.6);
+    cursor: pointer;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold-light);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-pct {
+    font-size: 12px;
+    color: var(--gold-light);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* AYET BANNER */
+  .ayet-banner {
+    background: var(--gold-pale);
+    border-left: 4px solid var(--gold);
+    border-bottom: 1px solid rgba(183,134,11,0.15);
+    padding: 16px 48px;
+    max-width: 100%;
+  }
+
+  .ayet-banner-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .ayet-text {
+    font-family: 'Amiri', serif;
+    font-size: 17px;
+    color: #4A3200;
+    font-style: italic;
+    line-height: 1.8;
+  }
+
+  .ayet-source {
+    font-size: 12px;
+    color: var(--gold);
+    margin-top: 4px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 48px 0;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* CARDS */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .icon-green { background: var(--green-pale); }
+  .icon-gold { background: var(--gold-pale); }
+  .icon-purple { background: #EDE9F8; }
+  .icon-blue { background: #E8F0FE; }
+  .icon-rose { background: #FDE8EC; }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .card-subtitle {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 1px;
+  }
+
+  /* NAMAZ VAKİTLERİ */
+  .namaz-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .namaz-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--cream);
+    position: relative;
+    user-select: none;
+  }
+
+  .namaz-item:hover { border-color: var(--green-mid); background: var(--green-pale); }
+
+  .namaz-item.done {
+    background: var(--green-pale);
+    border-color: var(--green-light);
+  }
+
+  .namaz-item.done .namaz-name { color: var(--green-deep); font-weight: 700; }
+  .namaz-item.done .namaz-tick { background: var(--green-light); }
+  .namaz-item.done .namaz-tick::after { opacity: 1; }
+
+  .namaz-tick {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(27,67,50,0.1);
+    margin-bottom: 8px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .namaz-tick::after {
+    content: '✓';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 12px;
+    color: #fff;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .namaz-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-align: center;
+  }
+
+  .namaz-time {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 3px;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .namaz-time-input {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 3px;
+    background: none;
+    border: none;
+    text-align: center;
+    width: 52px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    outline: none;
+  }
+
+  .namaz-time-input:hover { color: var(--green-mid); }
+
+  /* SABAH UYARISI */
+  .sabah-uyari {
+    background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  .sabah-uyari-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .sabah-uyari-text strong {
+    display: block;
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .sabah-uyari-text span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.5;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li:hover { opacity: 0.8; }
+
+  .checklist li.checked .check-text {
+    text-decoration: line-through;
+    color: var(--text-light);
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-strong);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: #fff;
+  }
+
+  .checklist li.checked .checkbox {
+    background: var(--green-mid);
+    border-color: var(--green-mid);
+  }
+
+  .checklist li.checked .checkbox::after {
+    content: '✓';
+    font-size: 11px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  .check-text {
+    font-size: 14px;
+    color: var(--text-main);
+    line-height: 1.5;
+  }
+
+  .check-badge {
+    font-size: 10px;
+    background: var(--green-pale);
+    color: var(--green-deep);
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 700;
+    margin-left: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .check-badge.gold {
+    background: var(--gold-pale);
+    color: #5A3E00;
+  }
+
+  /* ZAMAN BLOKLARI */
+  .time-block-list { list-style: none; }
+
+  .time-block {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .time-block:last-child { border-bottom: none; }
+
+  .tb-time {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-light);
+    letter-spacing: 0.5px;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .tb-content {
+    font-size: 14px;
+    color: var(--text-main);
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
+    font-family: 'Lato', sans-serif;
+    border-bottom: 1px dashed transparent;
+    transition: border-color 0.2s;
+    padding: 2px 0;
+  }
+
+  .tb-content:focus { border-bottom-color: var(--green-light); }
+  .tb-content::placeholder { color: var(--text-light); font-style: italic; }
+
+  .tb-pill {
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .pill-ibadet { background: var(--green-pale); color: var(--green-deep); }
+  .pill-calisma { background: #E8F0FE; color: #1A56DB; }
+  .pill-kisisel { background: #FDE8EC; color: #9B1C3A; }
+  .pill-dinlenme { background: var(--gold-pale); color: #5A3E00; }
+
+  /* OKUMA TAKİBİ */
+  .reading-items { display: flex; flex-direction: column; gap: 12px; }
+
+  .reading-item {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .reading-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .reading-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+
+  .reading-pct {
+    font-size: 12px;
+    color: var(--green-mid);
+    font-weight: 700;
+  }
+
+  .reading-bar-bg {
+    background: var(--border);
+    height: 5px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .reading-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--green-light);
+    transition: width 0.3s ease;
+  }
+
+  .reading-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .reading-controls input[type="range"] {
+    flex: 1;
+    accent-color: var(--green-mid);
+    height: 4px;
+  }
+
+  .reading-note {
+    font-size: 11px;
+    color: var(--text-light);
+    font-style: italic;
+  }
+
+  /* HEDEFLER */
+  .goal-input-wrap {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .goal-input {
+    flex: 1;
+    background: var(--cream);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 9px 13px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    color: var(--text-main);
+    outline: none;
+  }
+
+  .goal-input:focus { border-color: var(--green-mid); }
+  .goal-input::placeholder { color: var(--text-light); font-style: italic; }
+
+  .btn-add {
+    background: var(--green-deep);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    transition: background 0.2s;
+  }
+
+  .btn-add:hover { background: var(--green-mid); }
+
+  .goal-list { list-style: none; }
+
+  .goal-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    cursor: pointer;
+  }
+
+  .goal-item:last-child { border-bottom: none; }
+  .goal-item.done-goal .goal-text { text-decoration: line-through; color: var(--text-light); }
+  .goal-item.done-goal .goal-cb { background: var(--gold); border-color: var(--gold); }
+  .goal-item.done-goal .goal-cb::after { content: '✓'; font-size: 11px; color: #fff; font-weight: 700; }
+
+  .goal-cb {
+    width: 18px; height: 18px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .goal-text { font-size: 14px; color: var(--text-main); }
+
+  /* DEĞERLENDIRME */
+  .star-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .star {
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--border-strong);
+    transition: color 0.15s, transform 0.15s;
+    user-select: none;
+  }
+
+  .star:hover, .star.lit { color: var(--gold); transform: scale(1.2); }
+
+  .notes-area {
+    width: 100%;
+    background: var(--cream);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: 'Amiri', serif;
+    color: var(--text-main);
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+    line-height: 1.7;
+    margin-top: 12px;
+  }
+
+  .notes-area:focus { border-color: var(--green-mid); }
+  .notes-area::placeholder { color: var(--text-light); font-style: italic; }
+
+  .dua-area {
+    background: var(--green-deep);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 14px;
+  }
+
+  .dua-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .dua-input {
+    width: 100%;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.9);
+    font-family: 'Amiri', serif;
+    font-size: 15px;
+    font-style: italic;
+    outline: none;
+    resize: none;
+    min-height: 52px;
+    line-height: 1.7;
+  }
+
+  .dua-input::placeholder { color: rgba(255,255,255,0.3); }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 8px 0 20px;
+  }
+
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+
+  .divider-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--green-deep);
+    padding: 14px 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 100%;
+  }
+
+  .stat-item {
+    flex: 1;
+    text-align: center;
+    padding: 0 16px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .stat-item:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 680px) {
+    .header-inner, .main { padding-left: 20px; padding-right: 20px; }
+    .ayet-banner { padding-left: 20px; padding-right: 20px; }
+    .stats-bar { padding-left: 20px; padding-right: 20px; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .namaz-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .namaz-name { font-size: 10px; }
+    .header-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="page-bg">
+
+  <!-- GEOMETRİK HEADER -->
+  <div class="header">
+    <svg class="header-geo" viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="280" cy="20" r="80" stroke="white" stroke-width="1"/>
+      <circle cx="280" cy="20" r="55" stroke="white" stroke-width="1"/>
+      <circle cx="280" cy="20" r="30" stroke="white" stroke-width="1"/>
+      <line x1="200" y1="20" x2="300" y2="120" stroke="white" stroke-width="0.5"/>
+      <line x1="160" y1="80" x2="280" y2="80" stroke="white" stroke-width="0.5"/>
+      <polygon points="280,20 230,100 330,100" stroke="white" stroke-width="0.5" fill="none"/>
+      <polygon points="280,20 260,70 300,70" stroke="white" stroke-width="0.5" fill="none"/>
+    </svg>
+    <div class="header-inner">
+      <div class="header-top">
+        <div>
+          <span class="basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</span>
+          <p class="header-title">Günlük Planlayıcı</p>
+          <p class="header-date" id="displayDate">Cumartesi, 4 Ocak</p>
+          <p class="header-hijri" id="displayHijri">5 Cemâziyelâhir 1446</p>
+        </div>
+        <div class="date-controls">
+          <input type="date" id="datePicker" onchange="updateDate(this.value)" />
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);">Tarihi değiştir</span>
+        </div>
+      </div>
+      <div class="progress-bar-wrap">
+        <span class="progress-label">Günlük tamamlanma</span>
+        <div class="progress-track">
+          <div class="progress-fill" id="globalProgress" style="width:0%"></div>
+        </div>
+        <span class="progress-pct" id="globalPct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="namazCount">0/5</div>
+      <div class="stat-lbl">Namaz</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="virdCount">0/8</div>
+      <div class="stat-lbl">Vird</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="hedefCount">0/3</div>
+      <div class="stat-lbl">Hedef</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="okumaCount">0%</div>
+      <div class="stat-lbl">Okuma</div>
+    </div>
+  </div>
+
+  <!-- AYET BANNER -->
+  <div class="ayet-banner">
+    <div class="ayet-banner-inner">
+      <p class="ayet-text">"Sabah namazını kıl! Çünkü sabah namazı gerçekten şahitlidir."</p>
+      <p class="ayet-source">— İsrâ Sûresi, 17:78</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- NAMAZ VAKİTLERİ -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-green">🕌</div>
+        <div>
+          <div class="card-title">Namaz Vakitleri</div>
+          <div class="card-subtitle">Vakitlere tıkla • Saati düzenleyebilirsin</div>
+        </div>
+      </div>
+
+      <div class="namaz-grid" id="namazGrid">
+        <div class="namaz-item" onclick="toggleNamaz(this, 'Sabah')" data-namaz="Sabah">
+          <div class="namaz-tick"></div>
+          <div class="namaz-name">SABAH</div>
+          <input class="namaz-time-input" type="time" value="05:30" onclick="e=>e.stopPropagation()" />
+        </div>
+        <div class="namaz-item" onclick="toggleNamaz(this, 'Öğle')" data-namaz="Öğle">
+          <div class="namaz-tick"></div>
+          <div class="namaz-name">ÖĞLE</div>
+          <input class="namaz-time-input" type="time" value="13:10" onclick="e=>e.stopPropagation()" />
+        </div>
+        <div class="namaz-item" onclick="toggleNamaz(this, 'İkindi')" data-namaz="İkindi">
+          <div class="namaz-tick"></div>
+          <div class="namaz-name">İKİNDİ</div>
+          <input class="namaz-time-input" type="time" value="16:20" onclick="e=>e.stopPropagation()" />
+        </div>
+        <div class="namaz-item" onclick="toggleNamaz(this, 'Akşam')" data-namaz="Akşam">
+          <div class="namaz-tick"></div>
+          <div class="namaz-name">AKŞAM</div>
+          <input class="namaz-time-input" type="time" value="18:45" onclick="e=>e.stopPropagation()" />
+        </div>
+        <div class="namaz-item" onclick="toggleNamaz(this, 'Yatsı')" data-namaz="Yatsı">
+          <div class="namaz-tick"></div>
+          <div class="namaz-name">YATSI</div>
+          <input class="namaz-time-input" type="time" value="20:10" onclick="e=>e.stopPropagation()" />
+        </div>
+      </div>
+
+      <div class="sabah-uyari">
+        <div class="sabah-uyari-icon">🌅</div>
+        <div class="sabah-uyari-text">
+          <strong>Sabah namazından sonra uyuma!</strong>
+          <span>Sabah namazı, günün en bereketli başlangıcıdır. Namazdan sonra kalkmak; rızkın genişlemesine, günün verimliliğine vesile olur. Uyuyanın rızkı bağlanır.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SABAH + VİRD -->
+    <div class="two-col">
+
+      <!-- SABAH RUTINI -->
+      <div class="card" style="margin-bottom:0">
+        <div class="card-header">
+          <div class="card-icon icon-gold">🌄</div>
+          <div>
+            <div class="card-title">Sabah Rutini</div>
+            <div class="card-subtitle">Namazdan sonra</div>
+          </div>
+        </div>
+        <ul class="checklist" id="sabahList">
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Sabah namazı kılındı</span>
+            <span class="check-badge">Farz</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Kuran'dan 1 sayfa okundu</span>
+            <span class="check-badge">Sünnet</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Sabah zikri yapıldı</span>
+            <span class="check-badge">Sünnet</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Su içildi &amp; hafif yemek</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Günün niyeti kuruldu</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Egzersiz / yürüyüş</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- VİRD / ZİKİR -->
+      <div class="card" style="margin-bottom:0">
+        <div class="card-header">
+          <div class="card-icon icon-purple">📿</div>
+          <div>
+            <div class="card-title">Günlük Vird</div>
+            <div class="card-subtitle">Zikir &amp; dua listesi</div>
+          </div>
+        </div>
+        <ul class="checklist" id="virdList">
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Sabah ezkarı (33+33+34)</span>
+            <span class="check-badge gold">Günaşırı</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">İstiğfar — 100 kez</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Salavat — 100 kez</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Yasin suresi okundu</span>
+            <span class="check-badge gold">Cuma</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Kuran hatim takibi</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Akşam ezkarı</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Yatmadan önce dualar</span>
+          </li>
+          <li onclick="toggleCheck(this)">
+            <div class="checkbox"></div>
+            <span class="check-text">Teheccüd / kuşluk namazı</span>
+            <span class="check-badge gold">Nâfile</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div style="height:20px"></div>
+
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <span class="divider-label">Çalışma &amp; Üretim</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- ÇALIŞMA SAATLERİ -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">⏱</div>
+        <div>
+          <div class="card-title">Günlük Program</div>
+          <div class="card-subtitle">Görev kutularına tıklayarak düzenleyebilirsin</div>
+        </div>
+      </div>
+      <ul class="time-block-list">
+        <li class="time-block">
+          <span class="tb-time">05:30–06:30</span>
+          <input class="tb-content" type="text" placeholder="Sabah namazı &amp; vird" value="🕌 Sabah namazı &amp; sabah virdi" />
+          <span class="tb-pill pill-ibadet">İbadet</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">06:30–07:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="📖 Kuran &amp; dini okuma" />
+          <span class="tb-pill pill-ibadet">İbadet</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">07:30–09:00</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="🌿 Kahvaltı &amp; hazırlık" />
+          <span class="tb-pill pill-kisisel">Kişisel</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">09:00–12:00</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="💼 Odaklanmış çalışma — Blok 1" />
+          <span class="tb-pill pill-calisma">Çalışma</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">12:00–13:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 Öğle namazı &amp; öğle yemeği" />
+          <span class="tb-pill pill-ibadet">İbadet</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">13:30–16:00</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="💼 Odaklanmış çalışma — Blok 2" />
+          <span class="tb-pill pill-calisma">Çalışma</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">16:00–16:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 İkindi namazı &amp; mola" />
+          <span class="tb-pill pill-ibadet">İbadet</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">16:30–18:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="📚 Okuma / kişisel gelişim" />
+          <span class="tb-pill pill-kisisel">Kişisel</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">18:45–19:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 Akşam namazı &amp; iftar/akşam yemeği" />
+          <span class="tb-pill pill-ibadet">İbadet</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">20:10–21:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 Yatsı namazı &amp; aile vakti" />
+          <span class="tb-pill pill-ibadet">İbadet</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">21:30–22:30</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="📖 Akşam okuma &amp; değerlendirme" />
+          <span class="tb-pill pill-dinlenme">Dinlenme</span>
+        </li>
+        <li class="time-block">
+          <span class="tb-time">22:30–05:00</span>
+          <input class="tb-content" type="text" placeholder="Aktivite..." value="🌙 Uyku" />
+          <span class="tb-pill pill-dinlenme">Dinlenme</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- OKUMA TAKİBİ -->
+    <div class="two-col">
+      <div class="card" style="margin-bottom:0">
+        <div class="card-header">
+          <div class="card-icon icon-green">📚</div>
+          <div>
+            <div class="card-title">Okuma Takibi</div>
+            <div class="card-subtitle">Kaydırarak güncelle</div>
+          </div>
+        </div>
+        <div class="reading-items">
+          <div class="reading-item">
+            <div class="reading-header">
+              <span class="reading-title">📗 Kuran-ı Kerim</span>
+              <span class="reading-pct" id="kuran-pct">0%</span>
+            </div>
+            <div class="reading-bar-bg">
+              <div class="reading-bar" id="kuran-bar" style="width:0%"></div>
+            </div>
+            <div class="reading-controls">
+              <input type="range" min="0" max="604" value="0" id="kuran-range" oninput="updateReading('kuran',this.value,604)" />
+              <span class="reading-note" id="kuran-note">0 / 604 sayfa</span>
+            </div>
+          </div>
+          <div class="reading-item">
+            <div class="reading-header">
+              <span class="reading-title">📘 Hadis / İlmihal</span>
+              <span class="reading-pct" id="hadis-pct">0%</span>
+            </div>
+            <div class="reading-bar-bg">
+              <div class="reading-bar" id="hadis-bar" style="width:0%"></div>
+            </div>
+            <div class="reading-controls">
+              <input type="range" min="0" max="100" value="0" id="hadis-range" oninput="updateReading('hadis',this.value,100)" />
+              <span class="reading-note" id="hadis-note">0 / 100 sayfa</span>
+            </div>
+          </div>
+          <div class="reading-item">
+            <div class="reading-header">
+              <span class="reading-title">📙 Kişisel Gelişim</span>
+              <span class="reading-pct" id="kitap-pct">0%</span>
+            </div>
+            <div class="reading-bar-bg">
+              <div class="reading-bar" id="kitap-bar" style="width:0%"></div>
+            </div>
+            <div class="reading-controls">
+              <input type="range" min="0" max="300" value="0" id="kitap-range" oninput="updateReading('kitap',this.value,300)" />
+              <span class="reading-note" id="kitap-note">0 / 300 sayfa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GÜNLÜK HEDEFLER -->
+      <div class="card" style="margin-bottom:0">
+        <div class="card-header">
+          <div class="card-icon icon-rose">🎯</div>
+          <div>
+            <div class="card-title">Günün Hedefleri</div>
+            <div class="card-subtitle">3 ana hedef belirle</div>
+          </div>
+        </div>
+        <div class="goal-input-wrap">
+          <input class="goal-input" type="text" id="goalInput" placeholder="Yeni hedef ekle..." onkeydown="if(event.key==='Enter')addGoal()" />
+          <button class="btn-add" onclick="addGoal()">+</button>
+        </div>
+        <ul class="goal-list" id="goalList">
+          <li class="goal-item" onclick="toggleGoal(this)">
+            <div class="goal-cb"></div>
+            <span class="goal-text">Sabah namazını kaçırmamak</span>
+          </li>
+          <li class="goal-item" onclick="toggleGoal(this)">
+            <div class="goal-cb"></div>
+            <span class="goal-text">4 saat odaklanmış çalışma</span>
+          </li>
+          <li class="goal-item" onclick="toggleGoal(this)">
+            <div class="goal-cb"></div>
+            <span class="goal-text">30 dakika okuma yapmak</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <span class="divider-label">Akşam Değerlendirmesi</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- DEĞERLENDİRME -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-gold">🌙</div>
+        <div>
+          <div class="card-title">Günün Muhasebesi</div>
+          <div class="card-subtitle">Her gece kendini hesaba çek</div>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-bottom:14px;">
+        <div>
+          <p style="font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">GÜNÜ NASIL GEÇİRDİN?</p>
+          <div class="star-row" id="stars">
+            <span class="star" onclick="rateStar(1)">★</span>
+            <span class="star" onclick="rateStar(2)">★</span>
+            <span class="star" onclick="rateStar(3)">★</span>
+            <span class="star" onclick="rateStar(4)">★</span>
+            <span class="star" onclick="rateStar(5)">★</span>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">GÜNÜN ŞÜKRÜ</p>
+          <input type="text" style="width:100%;background:var(--cream);border:1px solid var(--border-strong);border-radius:8px;padding:9px 13px;font-size:14px;font-family:'Amiri',serif;color:var(--text-main);outline:none;font-style:italic;" placeholder="Bugün neye şükrettim..." />
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">GÜNÜN NOTU &amp; TEFEKKÜRü</p>
+      <textarea class="notes-area" placeholder="Bugün ne öğrendim? Ne yaptım iyi? Yarın neyi daha iyi yapabilirim?..."></textarea>
+
+      <div class="dua-area">
+        <div class="dua-label">Akşam Duası</div>
+        <textarea class="dua-input" rows="2" placeholder="Bugün Rabbime dua ettim ki..."></textarea>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /page-bg -->
+
+<script>
+  // TARİH
+  const today = new Date();
+  const dp = document.getElementById('datePicker');
+  dp.value = today.toISOString().split('T')[0];
+  updateDate(dp.value);
+
+  function updateDate(v) {
+    const d = new Date(v + 'T12:00:00');
+    const days = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    const months = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+    document.getElementById('displayDate').textContent = days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+    document.getElementById('displayHijri').textContent = toHijri(d);
+  }
+
+  function toHijri(d) {
+    const hijriMonths = ['Muharrem','Safer','Rebiülevvel','Rebiülâhir','Cemâziyelevvel','Cemâziyelâhir','Recep','Şaban','Ramazan','Şevval','Zilkade','Zilhicce'];
+    const jd = Math.floor((d.getTime()/86400000)+2440587.5);
+    let l = jd - 1948440 + 10632;
+    const n = Math.floor((l-1)/10631);
+    l = l - 10631*n + 354;
+    const j = Math.floor((10985-l)/5965);
+    l = l - Math.floor(j*5965/11);
+    let m = Math.floor(l/30);
+    const dy = l - Math.floor(m*29.5001) + 29 + j;
+    let mo = ((m + 1) % 12) + 1;
+    const yr = 30*n + 11 - j + Math.floor((m+2)/12);
+    return dy + ' ' + hijriMonths[mo-1] + ' ' + yr;
+  }
+
+  // NAMAZ TOGGLE
+  function toggleNamaz(el, name) {
+    if (event && event.target.tagName === 'INPUT') return;
+    el.classList.toggle('done');
+    updateStats();
+  }
+
+  // CHECKLIST TOGGLE
+  function toggleCheck(li) {
+    li.classList.toggle('checked');
+    updateStats();
+  }
+
+  // GOAL
+  function addGoal() {
+    const inp = document.getElementById('goalInput');
+    const val = inp.value.trim();
+    if (!val) return;
+    const li = document.createElement('li');
+    li.className = 'goal-item';
+    li.onclick = function(){ toggleGoal(this); };
+    li.innerHTML = '<div class="goal-cb"></div><span class="goal-text">' + val + '</span>';
+    document.getElementById('goalList').appendChild(li);
+    inp.value = '';
+    updateStats();
+  }
+
+  function toggleGoal(li) {
+    li.classList.toggle('done-goal');
+    updateStats();
+  }
+
+  // OKUMA
+  function updateReading(id, v, max) {
+    const pct = Math.round((v/max)*100);
+    document.getElementById(id+'-bar').style.width = pct+'%';
+    document.getElementById(id+'-pct').textContent = pct+'%';
+    document.getElementById(id+'-note').textContent = v+' / '+max+' sayfa';
+    updateStats();
+  }
+
+  // YILDIZ
+  function rateStar(n) {
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((s,i) => { s.classList.toggle('lit', i < n); });
+  }
+
+  // STATS GÜNCELLE
+  function updateStats() {
+    const namazDone = document.querySelectorAll('#namazGrid .namaz-item.done').length;
+    document.getElementById('namazCount').textContent = namazDone+'/5';
+
+    const virdTotal = document.querySelectorAll('#virdList li').length;
+    const virdDone = document.querySelectorAll('#virdList li.checked').length;
+    document.getElementById('virdCount').textContent = virdDone+'/'+virdTotal;
+
+    const hedefTotal = document.querySelectorAll('#goalList li').length;
+    const hedefDone = document.querySelectorAll('#goalList li.done-goal').length;
+    document.getElementById('hedefCount').textContent = hedefDone+'/'+hedefTotal;
+
+    const kp = parseInt(document.getElementById('kuran-pct').textContent)||0;
+    const hp = parseInt(document.getElementById('hadis-pct').textContent)||0;
+    const bp = parseInt(document.getElementById('kitap-pct').textContent)||0;
+    const avgRead = Math.round((kp+hp+bp)/3);
+    document.getElementById('okumaCount').textContent = avgRead+'%';
+
+    // GLOBAL PROGRESS
+    const sabahDone = document.querySelectorAll('#sabahList li.checked').length;
+    const sabahTotal = document.querySelectorAll('#sabahList li').length;
+    const totalItems = 5 + virdTotal + hedefTotal + sabahTotal;
+    const donedItems = namazDone + virdDone + hedefDone + sabahDone;
+    const pct = totalItems > 0 ? Math.round((donedItems/totalItems)*100) : 0;
+    document.getElementById('globalProgress').style.width = pct+'%';
+    document.getElementById('globalPct').textContent = pct+'%';
+  }
+
+  updateStats();
+</script>
+</body>
+</html>
