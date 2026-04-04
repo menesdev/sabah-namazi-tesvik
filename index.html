@@ -6,38 +6,44 @@
 <title>Günlük Planlayıcı</title>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 <div class="page-bg">
 
   <!-- GEOMETRİK HEADER -->
   <div class="header">
-    <svg class="header-geo" viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="280" cy="20" r="80" stroke="white" stroke-width="1"/>
-      <circle cx="280" cy="20" r="55" stroke="white" stroke-width="1"/>
-      <circle cx="280" cy="20" r="30" stroke="white" stroke-width="1"/>
-      <line x1="200" y1="20" x2="300" y2="120" stroke="white" stroke-width="0.5"/>
-      <line x1="160" y1="80" x2="280" y2="80" stroke="white" stroke-width="0.5"/>
-      <polygon points="280,20 230,100 330,100" stroke="white" stroke-width="0.5" fill="none"/>
-      <polygon points="280,20 260,70 300,70" stroke="white" stroke-width="0.5" fill="none"/>
+    <svg class="header-geo" viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="280" cy="30" r="90" stroke="white" stroke-width="1"/>
+      <circle cx="280" cy="30" r="60" stroke="white" stroke-width="0.8"/>
+      <circle cx="280" cy="30" r="35" stroke="white" stroke-width="0.6"/>
+      <line x1="190" y1="30" x2="300" y2="130" stroke="white" stroke-width="0.5"/>
+      <line x1="150" y1="90" x2="280" y2="90" stroke="white" stroke-width="0.4"/>
+      <polygon points="280,30 225,115 335,115" stroke="white" stroke-width="0.5" fill="none"/>
     </svg>
     <div class="header-inner">
-      
       <div class="header-top">
-        <div>
+        <div class="header-left">
           <span class="basmala">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</span>
-          <div style="display:flex; gap:12px; align-items:center; margin-bottom:6px;">
-            <p class="header-title" style="margin:0;">Günlük Planlayıcı</p>
-            <a href="history.html" style="color:var(--gold-light); font-size:12px; text-decoration:none; font-weight:bold;">Geçmişi Gör ➝</a>
+          <div class="header-meta">
+            <p class="header-title">Günlük Planlayıcı</p>
+            <a href="history.html" class="header-history-link">Geçmişi Gör →</a>
           </div>
           <p class="header-date" id="displayDate">Cumartesi, 4 Ocak</p>
           <p class="header-hijri" id="displayHijri">5 Cemâziyelâhir 1446</p>
+          <div class="live-clock" id="liveClock">00:00:00</div>
+          <div class="live-clock-label">Şu anki saat</div>
         </div>
         <div class="date-controls">
-          <button id="loginBtn" style="background:var(--gold); border:none; padding:6px 12px; color:#fff; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; margin-bottom:10px;">Giriş Yap</button>
+          <div class="header-actions">
+            <button id="loginBtn">Giriş Yap</button>
+            <button class="theme-toggle" id="themeToggle" title="Tema değiştir">🌙</button>
+          </div>
           <input type="date" id="datePicker" onchange="updateDate(this.value)" />
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);">Tarihi değiştir</span>
+          <span>Tarihi değiştir</span>
+          <div id="streakBadge" class="streak-badge" style="display:none;">
+            <span class="streak-fire">🔥</span>
+            <span id="streakText">3 günlük seri</span>
+          </div>
         </div>
       </div>
       <div class="progress-bar-wrap">
@@ -52,29 +58,30 @@
 
   <!-- STATS BAR -->
   <div class="stats-bar">
-    <div class="stat-item">
+    <div class="stat-item" onclick="document.getElementById('namazGrid').scrollIntoView({behavior:'smooth'})" style="cursor:pointer;">
       <div class="stat-num" id="namazCount">0/5</div>
       <div class="stat-lbl">Namaz</div>
     </div>
-    <div class="stat-item">
+    <div class="stat-item" onclick="document.getElementById('virdList').scrollIntoView({behavior:'smooth'})" style="cursor:pointer;">
       <div class="stat-num" id="virdCount">0/8</div>
       <div class="stat-lbl">Vird</div>
     </div>
-    <div class="stat-item">
+    <div class="stat-item" onclick="document.getElementById('goalList').scrollIntoView({behavior:'smooth'})" style="cursor:pointer;">
       <div class="stat-num" id="hedefCount">0/3</div>
       <div class="stat-lbl">Hedef</div>
     </div>
-    <div class="stat-item">
+    <div class="stat-item" onclick="document.querySelector('.reading-items').scrollIntoView({behavior:'smooth'})" style="cursor:pointer;">
       <div class="stat-num" id="okumaCount">0%</div>
       <div class="stat-lbl">Okuma</div>
     </div>
   </div>
 
   <!-- AYET BANNER -->
-  <div class="ayet-banner">
+  <div class="ayet-banner" id="ayetBanner" onclick="rotateAyet()" title="Farklı ayet için tıkla">
     <div class="ayet-banner-inner">
-      <p class="ayet-text">"Sabah namazını kıl! Çünkü sabah namazı gerçekten şahitlidir."</p>
-      <p class="ayet-source">— İsrâ Sûresi, 17:78</p>
+      <p class="ayet-text" id="ayetText">"Sabah namazını kıl! Çünkü sabah namazı gerçekten şahitlidir."</p>
+      <p class="ayet-source" id="ayetSource">— İsrâ Sûresi, 17:78</p>
+      <span class="ayet-hint">↻ Tıkla</span>
     </div>
   </div>
 
@@ -87,35 +94,40 @@
         <div class="card-icon icon-green">🕌</div>
         <div>
           <div class="card-title">Namaz Vakitleri</div>
-          <div class="card-subtitle">Vakitlere tıkla • Saati düzenleyebilirsin</div>
+          <div class="card-subtitle">Vakite tıkla • Saati düzenleyebilirsin</div>
         </div>
       </div>
 
       <div class="namaz-grid" id="namazGrid">
         <div class="namaz-item" onclick="toggleNamaz(this, 'Sabah')" data-namaz="Sabah">
+          <div class="namaz-emoji">🌅</div>
           <div class="namaz-tick"></div>
           <div class="namaz-name">SABAH</div>
-          <input class="namaz-time-input" type="time" value="05:30" onclick="e=>e.stopPropagation()" />
+          <input class="namaz-time-input" type="time" value="05:30" onclick="event.stopPropagation()" />
         </div>
         <div class="namaz-item" onclick="toggleNamaz(this, 'Öğle')" data-namaz="Öğle">
+          <div class="namaz-emoji">☀️</div>
           <div class="namaz-tick"></div>
           <div class="namaz-name">ÖĞLE</div>
-          <input class="namaz-time-input" type="time" value="13:10" onclick="e=>e.stopPropagation()" />
+          <input class="namaz-time-input" type="time" value="13:10" onclick="event.stopPropagation()" />
         </div>
         <div class="namaz-item" onclick="toggleNamaz(this, 'İkindi')" data-namaz="İkindi">
+          <div class="namaz-emoji">🌤</div>
           <div class="namaz-tick"></div>
           <div class="namaz-name">İKİNDİ</div>
-          <input class="namaz-time-input" type="time" value="16:20" onclick="e=>e.stopPropagation()" />
+          <input class="namaz-time-input" type="time" value="16:20" onclick="event.stopPropagation()" />
         </div>
         <div class="namaz-item" onclick="toggleNamaz(this, 'Akşam')" data-namaz="Akşam">
+          <div class="namaz-emoji">🌇</div>
           <div class="namaz-tick"></div>
           <div class="namaz-name">AKŞAM</div>
-          <input class="namaz-time-input" type="time" value="18:45" onclick="e=>e.stopPropagation()" />
+          <input class="namaz-time-input" type="time" value="18:45" onclick="event.stopPropagation()" />
         </div>
         <div class="namaz-item" onclick="toggleNamaz(this, 'Yatsı')" data-namaz="Yatsı">
+          <div class="namaz-emoji">🌙</div>
           <div class="namaz-tick"></div>
           <div class="namaz-name">YATSI</div>
-          <input class="namaz-time-input" type="time" value="20:10" onclick="e=>e.stopPropagation()" />
+          <input class="namaz-time-input" type="time" value="20:10" onclick="event.stopPropagation()" />
         </div>
       </div>
 
@@ -144,29 +156,35 @@
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
             <span class="check-text">Sabah namazı kılındı</span>
-            <span class="check-badge">Farz</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-badge">Farz</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
             <span class="check-text">Kuran'dan 1 sayfa okundu</span>
-            <span class="check-badge">Sünnet</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-badge">Sünnet</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
             <span class="check-text">Sabah zikri yapıldı</span>
-            <span class="check-badge">Sünnet</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-badge">Sünnet</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Su içildi &amp; hafif yemek</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Su içildi &amp; hafif yemek</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Günün niyeti kuruldu</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Günün niyeti kuruldu</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Egzersiz / yürüyüş</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Egzersiz / yürüyüş</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
         </ul>
         <div class="goal-input-wrap" style="margin-top:14px; margin-bottom:0;">
@@ -188,37 +206,45 @@
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
             <span class="check-text">Sabah ezkarı (33+33+34)</span>
-            <span class="check-badge gold">Günaşırı</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-badge gold">Günaşırı</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">İstiğfar — 100 kez</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">İstiğfar — 100 kez</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Salavat — 100 kez</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Salavat — 100 kez</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
             <span class="check-text">Yasin suresi okundu</span>
-            <span class="check-badge gold">Cuma</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-badge gold">Cuma</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Kuran hatim takibi</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Kuran hatim takibi</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Akşam ezkarı</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Akşam ezkarı</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
-            <span class="check-text">Yatmadan önce dualar</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-text">Yatmadan önce dualar</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li onclick="toggleCheck(this, event)">
             <div class="checkbox"></div>
             <span class="check-text">Teheccüd / kuşluk namazı</span>
-            <span class="check-badge gold">Nâfile</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="check-badge gold">Nâfile</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
         </ul>
         <div class="goal-input-wrap" style="margin-top:14px; margin-bottom:0;">
@@ -249,123 +275,135 @@
       <ul class="time-block-list">
         <li class="time-block">
           <input class="tb-time-input" type="text" value="05:30–06:30" />
-          <input class="tb-content" type="text" placeholder="Sabah namazı &amp; vird" value="🕌 Sabah namazı &amp; sabah virdi" />
+          <input class="tb-content" type="text" value="🕌 Sabah namazı &amp; sabah virdi" />
           <select class="tb-pill pill-ibadet" onchange="changePill(this)">
-  <option value="pill-ibadet" selected>İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet" selected>İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="06:30–07:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="📖 Kuran &amp; dini okuma" />
+          <input class="tb-content" type="text" value="📖 Kuran &amp; dini okuma" />
           <select class="tb-pill pill-ibadet" onchange="changePill(this)">
-  <option value="pill-ibadet" selected>İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet" selected>İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="07:30–09:00" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="🌿 Kahvaltı &amp; hazırlık" />
+          <input class="tb-content" type="text" value="🌿 Kahvaltı &amp; hazırlık" />
           <select class="tb-pill pill-kisisel" onchange="changePill(this)">
-  <option value="pill-ibadet">İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel" selected>Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet">İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel" selected>Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="09:00–12:00" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="💼 Odaklanmış çalışma — Blok 1" />
+          <input class="tb-content" type="text" value="💼 Odaklanmış çalışma — Blok 1" />
           <select class="tb-pill pill-calisma" onchange="changePill(this)">
-  <option value="pill-ibadet">İbadet</option>
-  <option value="pill-calisma" selected>Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet">İbadet</option>
+            <option value="pill-calisma" selected>Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="12:00–13:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 Öğle namazı &amp; öğle yemeği" />
+          <input class="tb-content" type="text" value="🕌 Öğle namazı &amp; öğle yemeği" />
           <select class="tb-pill pill-ibadet" onchange="changePill(this)">
-  <option value="pill-ibadet" selected>İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet" selected>İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="13:30–16:00" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="💼 Odaklanmış çalışma — Blok 2" />
+          <input class="tb-content" type="text" value="💼 Odaklanmış çalışma — Blok 2" />
           <select class="tb-pill pill-calisma" onchange="changePill(this)">
-  <option value="pill-ibadet">İbadet</option>
-  <option value="pill-calisma" selected>Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet">İbadet</option>
+            <option value="pill-calisma" selected>Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="16:00–16:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 İkindi namazı &amp; mola" />
+          <input class="tb-content" type="text" value="🕌 İkindi namazı &amp; mola" />
           <select class="tb-pill pill-ibadet" onchange="changePill(this)">
-  <option value="pill-ibadet" selected>İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet" selected>İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="16:30–18:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="📚 Okuma / kişisel gelişim" />
+          <input class="tb-content" type="text" value="📚 Okuma / kişisel gelişim" />
           <select class="tb-pill pill-kisisel" onchange="changePill(this)">
-  <option value="pill-ibadet">İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel" selected>Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet">İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel" selected>Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="18:45–19:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 Akşam namazı &amp; iftar/akşam yemeği" />
+          <input class="tb-content" type="text" value="🕌 Akşam namazı &amp; iftar/akşam yemeği" />
           <select class="tb-pill pill-ibadet" onchange="changePill(this)">
-  <option value="pill-ibadet" selected>İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet" selected>İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="20:10–21:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="🕌 Yatsı namazı &amp; aile vakti" />
+          <input class="tb-content" type="text" value="🕌 Yatsı namazı &amp; aile vakti" />
           <select class="tb-pill pill-ibadet" onchange="changePill(this)">
-  <option value="pill-ibadet" selected>İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme">Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet" selected>İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme">Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="21:30–22:30" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="📖 Akşam okuma &amp; değerlendirme" />
+          <input class="tb-content" type="text" value="📖 Akşam okuma &amp; değerlendirme" />
           <select class="tb-pill pill-dinlenme" onchange="changePill(this)">
-  <option value="pill-ibadet">İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme" selected>Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet">İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme" selected>Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
         <li class="time-block">
           <input class="tb-time-input" type="text" value="22:30–05:00" />
-          <input class="tb-content" type="text" placeholder="Aktivite..." value="🌙 Uyku" />
+          <input class="tb-content" type="text" value="🌙 Uyku" />
           <select class="tb-pill pill-dinlenme" onchange="changePill(this)">
-  <option value="pill-ibadet">İbadet</option>
-  <option value="pill-calisma">Çalışma</option>
-  <option value="pill-kisisel">Kişisel</option>
-  <option value="pill-dinlenme" selected>Dinlenme</option>
-</select><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <option value="pill-ibadet">İbadet</option>
+            <option value="pill-calisma">Çalışma</option>
+            <option value="pill-kisisel">Kişisel</option>
+            <option value="pill-dinlenme" selected>Dinlenme</option>
+          </select>
+          <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
         </li>
       </ul>
       <div class="goal-input-wrap" style="margin-top:14px; margin-bottom:0;">
@@ -375,7 +413,7 @@
       </div>
     </div>
 
-    <!-- OKUMA TAKİBİ -->
+    <!-- OKUMA TAKİBİ + HEDEFLER -->
     <div class="two-col">
       <div class="card" style="margin-bottom:0">
         <div class="card-header">
@@ -389,7 +427,8 @@
           <div class="reading-item">
             <div class="reading-header">
               <span class="reading-title">📗 Kuran-ı Kerim</span>
-              <span class="reading-pct" id="kuran-pct">0%</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+              <span class="reading-pct" id="kuran-pct">0%</span>
+              <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
             </div>
             <div class="reading-bar-bg">
               <div class="reading-bar" id="kuran-bar" style="width:0%"></div>
@@ -402,7 +441,8 @@
           <div class="reading-item">
             <div class="reading-header">
               <span class="reading-title">📘 Hadis / İlmihal</span>
-              <span class="reading-pct" id="hadis-pct">0%</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+              <span class="reading-pct" id="hadis-pct">0%</span>
+              <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
             </div>
             <div class="reading-bar-bg">
               <div class="reading-bar" id="hadis-bar" style="width:0%"></div>
@@ -415,7 +455,8 @@
           <div class="reading-item">
             <div class="reading-header">
               <span class="reading-title">📙 Kişisel Gelişim</span>
-              <span class="reading-pct" id="kitap-pct">0%</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+              <span class="reading-pct" id="kitap-pct">0%</span>
+              <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
             </div>
             <div class="reading-bar-bg">
               <div class="reading-bar" id="kitap-bar" style="width:0%"></div>
@@ -449,15 +490,18 @@
         <ul class="goal-list" id="goalList">
           <li class="goal-item" onclick="toggleGoal(this, event)">
             <div class="goal-cb"></div>
-            <span class="goal-text">Sabah namazını kaçırmamak</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="goal-text">Sabah namazını kaçırmamak</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li class="goal-item" onclick="toggleGoal(this, event)">
             <div class="goal-cb"></div>
-            <span class="goal-text">4 saat odaklanmış çalışma</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="goal-text">4 saat odaklanmış çalışma</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
           <li class="goal-item" onclick="toggleGoal(this, event)">
             <div class="goal-cb"></div>
-            <span class="goal-text">30 dakika okuma yapmak</span><button class="btn-del" onclick="deleteItem(this, event)">✕</button>
+            <span class="goal-text">30 dakika okuma yapmak</span>
+            <button class="btn-del" onclick="deleteItem(this, event)">✕</button>
           </li>
         </ul>
       </div>
@@ -483,7 +527,7 @@
 
       <div class="two-col" style="margin-bottom:14px;">
         <div>
-          <p style="font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">GÜNÜ NASIL GEÇİRDİN?</p>
+          <p class="eval-label">Günü nasıl geçirdin?</p>
           <div class="star-row" id="stars">
             <span class="star" onclick="rateStar(1)">★</span>
             <span class="star" onclick="rateStar(2)">★</span>
@@ -493,25 +537,31 @@
           </div>
         </div>
         <div>
-          <p style="font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">GÜNÜN ŞÜKRÜ</p>
-          <input type="text" style="width:100%;background:var(--cream);border:1px solid var(--border-strong);border-radius:8px;padding:9px 13px;font-size:14px;font-family:'Amiri',serif;color:var(--text-main);outline:none;font-style:italic;" id="sukranInput" placeholder="Bugün neye şükrettim..." />
+          <p class="eval-label">Günün Şükrü</p>
+          <input type="text" class="sukran-input" id="sukranInput" placeholder="Bugün neye şükrettim..." />
         </div>
       </div>
 
-      <p style="font-size:12px;color:var(--text-muted);font-weight:700;letter-spacing:0.5px;margin-bottom:6px;">GÜNÜN NOTU &amp; TEFEKKÜRü</p>
-      <textarea class="notes-area" placeholder="Bugün ne öğrendim? Ne yaptım iyi? Yarın neyi daha iyi yapabilirim?..."></textarea>
-
+      <p class="eval-label">Günün Notu &amp; Tefekkürü</p>
+      <textarea class="notes-area" id="notesArea" placeholder="Bugün ne öğrendim? Ne yaptım iyi? Yarın neyi daha iyi yapabilirim?..."></textarea>
 
       <div class="dua-area">
         <div class="dua-label">Akşam Duası</div>
-        <textarea class="dua-input" rows="2" placeholder="Bugün Rabbime dua ettim ki..."></textarea>
+        <textarea class="dua-input" id="duaInput" rows="2" placeholder="Bugün Rabbime dua ettim ki..."></textarea>
       </div>
-      <button id="saveDayBtn" onclick="window.saveDayData()" style="width:100%; background:var(--gold); color:#5A3E00; border:none; padding:12px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; margin-top:20px; transition:background 0.2s;">Günü Kaydet</button>
+
+      <button id="saveDayBtn" class="save-btn" onclick="window.saveDayData()">Günü Kaydet ✦</button>
+      <p class="kbd-hint">
+        <span class="kbd">Ctrl</span> + <span class="kbd">S</span> ile de kaydedebilirsin
+      </p>
 
     </div>
 
   </div><!-- /main -->
 </div><!-- /page-bg -->
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
 
 <script src="script.js"></script>
 <script type="module" src="backend.js"></script>
