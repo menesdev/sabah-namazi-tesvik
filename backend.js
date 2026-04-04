@@ -22,7 +22,11 @@ onAuthStateChanged(auth, (user) => {
           await signInWithPopup(auth, provider);
         } catch(e) {
           console.error("Giriş hatası:", e);
-          alert("Giriş başarısız (" + e.code + "). Lütfen Firebase yapılandırmanızı kontrol edin.");
+          if (typeof showToast === 'function') {
+            showToast("Giriş başarısız: " + e.code, 'error');
+          } else {
+            alert("Giriş başarısız (" + e.code + "). Lütfen Firebase yapılandırmanızı kontrol edin.");
+          }
         }
       };
     }
@@ -31,7 +35,11 @@ onAuthStateChanged(auth, (user) => {
 
 window.saveDayData = async function() {
   if (!currentUser) {
-    alert("Verilerinizi kaydedebilmek için lütfen önce Google ile Giriş yapın.");
+    if (typeof showToast === 'function') {
+      showToast("Kaydetmek için önce Google ile giriş yapın.", 'warning');
+    } else {
+      alert("Verilerinizi kaydedebilmek için lütfen önce Google ile Giriş yapın.");
+    }
     return;
   }
   
@@ -126,10 +134,18 @@ window.saveDayData = async function() {
     const docRef = doc(db, 'users', currentUser.uid, 'days', dateStr);
     await setDoc(docRef, dayData);
 
-    alert("Gününüz başarıyla buluta kaydedildi!");
+    if (typeof showToast === 'function') {
+      showToast("Gününüz buluta kaydedildi! ✦");
+    } else {
+      alert("Gününüz başarıyla buluta kaydedildi!");
+    }
   } catch(e) {
     console.error("Kaydetme hatası:", e);
-    alert("Bir hata oluştu: " + e.message);
+    if (typeof showToast === 'function') {
+      showToast("Hata: " + e.message, 'error');
+    } else {
+      alert("Bir hata oluştu: " + e.message);
+    }
   } finally {
     saveBtn.textContent = 'Günü Kaydet';
     saveBtn.disabled = false;
